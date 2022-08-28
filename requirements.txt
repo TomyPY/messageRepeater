@@ -1,4 +1,6 @@
 aioschedule==0.5.2
 pyTelegramBotAPI==4.7.0
 pytz==2022.1
+aiohttp==3.8.1  
+requests==2.28.1
 
