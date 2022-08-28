@@ -1,1 +1,1 @@
-bot: python3 runner.py
+bot: python3 telegram_helper.py
