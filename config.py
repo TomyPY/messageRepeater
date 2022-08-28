@@ -9,6 +9,6 @@ logging.basicConfig(
 
 )
 
-TELEGRAM_TOKEN='5468621967:AAGedvS4KfHEv8702ZacnG0eybxBIz1D27E'
+TELEGRAM_TOKEN=TELEGRAM_TOKEN
 
 location='./MessagesDatabase.json'

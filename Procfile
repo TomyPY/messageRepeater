@@ -1,1 +1,0 @@
-bot: python3 telegram_helper.py
