@@ -1,14 +1,8 @@
-import logging
 import telebot
 import asyncio
 from config import TELEGRAM_TOKEN
 import datetime
 from models import RecurrentMessage
-
-# async def recurrent_loop():
-#     while True:
-#         data=RecurrentMessage().read()
-        
 
 bot=telebot.TeleBot(TELEGRAM_TOKEN)
 
