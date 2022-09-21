@@ -7,7 +7,7 @@ bot=telebot.TeleBot(TELEGRAM_TOKEN)
 #CLASS TO HANDLE DATABASE
 class RecurrentMessage:
     def __init__(self):
-        self.con=sqlite3.connect("MessagesDatabase.db")
+        self.con=sqlite3.connect("./MessagesDatabase.db")
         self.cur=self.con.cursor()
         self.create_table()
     
@@ -26,6 +26,10 @@ class RecurrentMessage:
             next_message TEXT,
             destruction_ids TEXT,
             next_destruction TEXT)""")
+
+    def ups(self):
+        self.cur.execute("""UPDATE messages SET next_message=null WHERE messages.type='daily'""")
+        self.con.commit()
 
     def insert(self, item):
         self.cur.execute("""INSERT OR IGNORE INTO messages VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)""", item)

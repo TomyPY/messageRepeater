@@ -22,7 +22,7 @@ async def manage_messages():
     if current_sec!=0:
         delay=60-current_sec
     
-    await asyncio.sleep(delay)
+    
 
 
     while True:
@@ -39,15 +39,18 @@ async def manage_messages():
 
                         #IF IS NOT THE TIME TO SEND THE MESSAGE, SKIP
                         if message[10]!=None:
+                            pass
                             if now<datetime.strptime(message[10], "%Y-%m-%d %H:%M:%S.%f"):
-                                print("Skiping... delay is not ready")
+                                #print("Skiping... delay is not ready")
                                 continue
                         
                         #start time and endtime manage
                         if message[5]!=None:
                             if message[9]=='daily':
                                 if message[10]==None:
-                                    if datetime.strptime(message[5], "%H:%M")<datetime.strptime(now.strftime("%H:%M"), "%H:%M") or datetime.strptime(message[5], "%H:%M")>datetime.strptime(now.strftime("%H:%M"), "%H:%M"):
+                                    #print(datetime.strptime(message[5]+':00', "%H:%M:%S"), datetime.strptime(now.strftime("%H:%M:%S"), "%H:%M:%S"), '-----', datetime.strptime(message[5]+':10', "%H:%M:%S"), datetime.strptime(now.strftime("%H:%M:%S"), "%H:%M:%S"))
+                                    if datetime.strptime(message[5]+':00', "%H:%M:%S")>datetime.strptime(now.strftime("%H:%M:%S"), "%H:%M:%S") or datetime.strptime(message[5]+':10', "%H:%M:%S")<datetime.strptime(now.strftime("%H:%M:%S"), "%H:%M:%S"):
+                                        #print("skiping not time")
                                         continue
                                 else:
                                     if datetime.strptime(message[10], "%Y-%m-%d %H:%M%:S.%f")<now:
@@ -58,10 +61,10 @@ async def manage_messages():
                                 now_time=datetime.strptime(now.strftime("%H:%M"), "%H:%M")
 
                                 if start_time>now_time>end_time:
-                                    print("Skiping... not time to send the msg")
+                                    #print("Skiping... not time to send the msg")
                                     continue
 
-                        #DELETE OLD MESSAGES
+                        # DELETE OLD MESSAGES
                         if message[8]!=None and message[11]!='' and message[12]!=None:
                             if datetime.strptime(message[12], "%Y-%m-%d %H:%M:%S.%f")<=datetime.now(pytz.timezone("Asia/Calcutta")).replace(tzinfo=None):
                                 message_id=message[11].split(" ")[0] if message[11].split(" ")[0]!='' else message[11].split(" ")[1]
@@ -95,7 +98,7 @@ async def manage_messages():
                             
                             RecurrentMessage().edit('next_destruction', int(message[0]), (datetime.now(pytz.timezone("Asia/Calcutta")).replace(tzinfo=None)+timedelta(minutes=int(message[8]))).strftime("%Y-%m-%d %H:%M:%S.%f"))
                         else:
-                            RecurrentMessage().edit('next_message',int(message[0]),(now+timedelta(days=1)).strftime("%Y-%m-%d %H:%M:%S.%f"))
+                            # RecurrentMessage().edit('next_message',int(message[0]),(now+timedelta(days=1)).strftime("%Y-%m-%d %H:%M:%S.%f"))
                             if message[11]!=None:
                                 try:
                                     RecurrentMessage().edit('destruction_ids', int(message[0]), " ".join(new_msg_ids)+f" {msg.message_id}")
@@ -109,4 +112,4 @@ async def manage_messages():
                     except Exception as e:
                         print(traceback.format_exc())
 
-                await asyncio.sleep(10)
+            await asyncio.sleep(10)

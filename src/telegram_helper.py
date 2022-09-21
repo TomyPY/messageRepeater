@@ -1,3 +1,4 @@
+from time import time
 from exceptions import *
 from config import TELEGRAM_TOKEN
 from models import RecurrentMessage
@@ -148,24 +149,18 @@ async def send_message(arr):
 
 #TELEGRAM HANDLER
 
-@bot.message_handler(func=lambda message:message.text.lower().split("@")[0]=="/start")
+@bot.message_handler(func=lambda message:message.text.lower().split("@")[0]=="/start" and message.from_user.id in [734203042, 1873806303])
 async def welcome_and_explanation(message):
     cid=message.chat.id
-
     markup = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
     markup.add('/create_message_allways', '/create_message_days', '/create_message_daily', '/show_messages', '/delete_message', '/edit_message')
     await bot.send_message(cid, "Hello! i'm a bot to handle your messages! Go to /help section to see all the commands",reply_markup=markup)
     
-@bot.message_handler(commands=['help'])
+@bot.message_handler(func=lambda message:message.text.lower().split("@")[0]=="/help" and message.from_user.id in [734203042, 1873806303])
 async def all_commands(message):
     await bot.send_message(message.chat.id, "________💫All commands💫________\n\n-/create_message_always - Create a message that works 24/7 has the ability of set a starter time and end time\n\n-/create_message_days - Create a message that works one or more days. To set to one day use monday monday or friday friday\n\n-/create_message_daily - Create a message that it sent daily at a certain time\n\n-/show_messages - To see all the active messages\n\n-/delete_message - to delete a message from the database\n\n-/edit_message - To edit a specific message from the database\n\n-/stop_bot - To stop all the schedule messages\n\n-/start_bot - To start all the schedule messages")
 
-
-@bot.message_handler(State="*")
-async def cancel_state(message):
-    await bot.send_message(message.chat.id, "Command canceled")
-
-@bot.message_handler(commands='create_message_allways')
+@bot.message_handler(func=lambda message:message.text.lower().split("@")[0]=="/create_message_allways" and message.from_user.id in [734203042, 1873806303])
 async def ask_title(message):
     cid=message.chat.id
     msg=message.text
@@ -181,7 +176,12 @@ async def ask_message(message):
         msg=message.text
         chat[cid]['title']=msg
 
+        if msg.lower()=='cancel':
+            await bot.send_message(cid, 'Command cancelled')
+            await bot.delete_state(message.from_user.id, cid)
+            return
 
+        print(await bot.get_state(message.from_user.id,message.chat.id))
         if chat[cid]['title'].lower()=='cancel':
             await bot.send_message(cid, "Task cancelled")
             return
@@ -202,8 +202,9 @@ async def ask_delay(message):
         chat[cid]['message']=msg
 
 
-        if chat[cid]['message'].lower()=='cancel':
-            await bot.send_message(cid, "Task cancelled")
+        if msg.lower()=='cancel':
+            await bot.send_message(cid, 'Command cancelled')
+            await bot.delete_state(message.from_user.id, cid)
             return
 
 
@@ -222,8 +223,9 @@ async def ask_only_in(message):
         chat[cid]['delay']=msg
 
 
-        if chat[cid]['delay'].lower()=='cancel':
-            await bot.send_message(cid, "Task cancelled")
+        if msg.lower()=='cancel':
+            await bot.send_message(cid, 'Command cancelled')
+            await bot.delete_state(message.from_user.id, cid)
             return
 
 
@@ -242,8 +244,9 @@ async def ask_destruction(message):
         chat[cid]['row_only_in']=msg
 
 
-        if chat[cid]['row_only_in'].lower()=='cancel':
-            await bot.send_message(cid, "Task cancelled")
+        if msg.lower()=='cancel':
+            await bot.send_message(cid, 'Command cancelled')
+            await bot.delete_state(message.from_user.id, cid)
             return
 
         int(chat[cid]['row_only_in'])
@@ -262,7 +265,8 @@ async def ask_time(message):
         msg=message.text
 
         if msg.lower()=='cancel':
-            await bot.send_message(cid, "Task cancelled")
+            await bot.send_message(cid, 'Command cancelled')
+            await bot.delete_state(message.from_user.id, cid)
             return
 
         int(msg)
@@ -283,6 +287,11 @@ async def save_data(message):
         cid=message.chat.id
         msg=message.text
         
+        if msg.lower()=='cancel':
+            await bot.send_message(cid, 'Command cancelled')
+            await bot.delete_state(message.from_user.id, cid)
+            return
+
         if msg.lower()=='default':
             chat[cid]['time']="12:00 21:00"
 
@@ -316,7 +325,7 @@ async def save_data(message):
         await bot.send_message(cid, e)
 
 
-@bot.message_handler(commands='create_message_days')
+@bot.message_handler(func=lambda message:message.text.lower().split("@")[0]=="/create_message_days" and message.from_user.id in [734203042, 1873806303])
 async def ask_title_days(message):
     cid=message.chat.id
     chat[cid]={}
@@ -330,6 +339,11 @@ async def ask_message_days(message):
         cid=message.chat.id
         msg=message.text
         chat[cid]['title']=msg
+
+        if msg.lower()=='cancel':
+            await bot.send_message(cid, 'Command cancelled')
+            await bot.delete_state(message.from_user.id, cid)
+            return
 
         await bot.send_message(cid, "Excellent!")
         await bot.send_message(cid, "What message do you want to send?")
@@ -345,6 +359,11 @@ async def ask_delay_days(message):
         msg=message.text
         chat[cid]['message']=msg
 
+        if msg.lower()=='cancel':
+            await bot.send_message(cid, 'Command cancelled')
+            await bot.delete_state(message.from_user.id, cid)
+            return
+
         await bot.send_message(cid, "We are almost done!")
         await bot.send_message(cid, "What delay do you want between the messages?")
         await bot.set_state(message.from_user.id, MyStates.delay_days, message.chat.id)
@@ -358,6 +377,11 @@ async def ask_only_in_days(message):
         cid=message.chat.id
         msg=message.text
         chat[cid]['delay']=msg
+
+        if msg.lower()=='cancel':
+            await bot.send_message(cid, 'Command cancelled')
+            await bot.delete_state(message.from_user.id, cid)
+            return
 
         await bot.send_message(cid, "Almost..")
         await bot.send_message(cid, "Can you give me id of the channel/group?")
@@ -373,6 +397,11 @@ async def ask_destruction(message):
         msg=message.text
         chat[cid]['row_only_in']=msg
 
+        if msg.lower()=='cancel':
+            await bot.send_message(cid, 'Command cancelled')
+            await bot.delete_state(message.from_user.id, cid)
+            return
+
         await bot.send_message(cid, "Almost..")
         await bot.send_message(cid, "Give me a self destruction time in minutes")
         await bot.set_state(message.from_user.id, MyStates.destruction_days, message.chat.id)
@@ -387,6 +416,11 @@ async def ask_time_days(message):
         msg=message.text
         chat[cid]['destruction']=msg
 
+        if msg.lower()=='cancel':
+            await bot.send_message(cid, 'Command cancelled')
+            await bot.delete_state(message.from_user.id, cid)
+            return
+
         await bot.send_message(cid, "You're doing it right...")
         await bot.send_message(cid, "Please specify a time, Ex: 7:00 21:00 or write 'default' to put it as default (12:00 21:00)")
         await bot.set_state(message.from_user.id, MyStates.time_days, message.chat.id)
@@ -394,16 +428,22 @@ async def ask_time_days(message):
     except Exception as e:
         await bot.send_message(cid, e)
 
-
 @bot.message_handler(state=MyStates.time_days)
 async def ask_days_days(message):
     try:
         cid=message.chat.id
         msg=message.text
      
+        if msg.lower()=='cancel':
+            await bot.send_message(cid, 'Command cancelled')
+            await bot.delete_state(message.from_user.id, cid)
+            return
+
         if msg.lower()=='default':  
             chat[cid]['time']="12:00 21:00"
             
+
+
         else:
             datetime.datetime.strptime(msg.split(" ")[0], "%H:%M")
             datetime.datetime.strptime(msg.split(" ")[1], "%H:%M")
@@ -423,6 +463,11 @@ async def save_data_days(message):
 
         cid=message.chat.id
         msg=message.text
+
+        if msg.lower()=='cancel':
+            await bot.send_message(cid, 'Command cancelled')
+            await bot.delete_state(message.from_user.id, cid)
+            return
 
         chat[cid]['days']=msg
         
@@ -452,7 +497,7 @@ async def save_data_days(message):
         await bot.send_message(cid, e)
 
 
-@bot.message_handler(commands='create_message_daily')
+@bot.message_handler(func=lambda message:message.text.lower().split("@")[0]=="/create_message_daily" and message.from_user.id in [734203042, 1873806303])
 async def ask_title_daily(message):
     cid=message.chat.id
     msg=message.text
@@ -468,6 +513,11 @@ async def ask_message_daily(message):
         msg=message.text
         chat[cid]['title']=msg
 
+        if msg.lower()=='cancel':
+            await bot.send_message(cid, 'Command cancelled')
+            await bot.delete_state(message.from_user.id, cid)
+            return
+
         await bot.send_message(cid, "Excellent!")
         await bot.send_message(cid, "What message do you want to send?")
         await bot.set_state(message.from_user.id, MyStates.message_daily, message.chat.id)
@@ -482,6 +532,11 @@ async def ask_delay_daily(message):
         msg=message.text
         chat[cid]['message']=msg
 
+        if msg.lower()=='cancel':
+            await bot.send_message(cid, 'Command cancelled')
+            await bot.delete_state(message.from_user.id, cid)
+            return
+
         await bot.send_message(cid, "We are almost done!")
         await bot.send_message(cid, "At what time of the day do you want to send the messages? Ex: 01:09")
         await bot.set_state(message.from_user.id, MyStates.delay_daily, message.chat.id)
@@ -494,6 +549,11 @@ async def ask_only_in_days(message):
     try:
         cid=message.chat.id
         msg=message.text
+
+        if msg.lower()=='cancel':
+            await bot.send_message(cid, 'Command cancelled')
+            await bot.delete_state(message.from_user.id, cid)
+            return
 
         datetime.datetime.strptime(msg, '%H:%M')
         chat[cid]['time']=msg
@@ -512,6 +572,11 @@ async def ask_destruction_days(message):
         msg=message.text
         chat[cid]['only_in']=msg
 
+        if msg.lower()=='cancel':
+            await bot.send_message(cid, 'Command cancelled')
+            await bot.delete_state(message.from_user.id, cid)
+            return
+
         int(chat[cid]['only_in'])
 
         await bot.send_message(cid, "Almost..")
@@ -528,6 +593,11 @@ async def ask_days_daily(message):
         msg=message.text
         chat[cid]['destruction']=msg  
 
+        if msg.lower()=='cancel':
+            await bot.send_message(cid, 'Command cancelled')
+            await bot.delete_state(message.from_user.id, cid)
+            return
+
         await bot.send_message(cid, "Finally...")
         await bot.send_message(cid, "Please specify a lapse of days, Ex: Monday Friday")
         await bot.set_state(message.from_user.id, MyStates.days_daily, message.chat.id)
@@ -543,7 +613,14 @@ async def save_data_daily(message):
         msg=message.text
         chat[cid]['days']=msg
         
+        if msg.lower()=='cancel':
+            await bot.send_message(cid, 'Command cancelled')
+            await bot.delete_state(message.from_user.id, cid)
+            return
+
         await bot.send_message(message.chat.id, f"Ready, take a look:\n<b>Title: {chat[cid]['title']}\nMessage: {chat[cid]['message']}\nTime: {chat[cid]['time']}\nOnly_in: {chat[cid]['only_in']}\nNotification: True\nDestruction: {chat[cid]['destruction']}\nType: Daily</b>", parse_mode="html")
+
+        print(time)
 
         item=(
             len(RecurrentMessage().read())+1,
@@ -577,10 +654,16 @@ async def show_recurrent_messages(message):
 
         data=RecurrentMessage().read()
         txt=''
-
+        limit=0
         if len(data)>0:
+            
             for row in data:
-                txt+=f'Row_id: <b>{row[0]}</b> \nTitle: <b>{row[1]}</b>  \nDelay: <b>{row[3]} minutes</b>  \nOnly_in: <b>{row[4]}</b> \nTime: <b>{row[5]}</b> \nDays: <b>{row[6]}</b> \nNotification: <b>{row[7]}</b> \nDestruction: <b>{row[8]} minutes</b> \nType: <b>{row[-1]}</b>\nMessage: <b>{row[2]}</b> \n<b>―――――――――――――――――――</b>\n\n'
+                limit+=1
+                txt+=f'Row_id: <b>{row[0]}</b> \nTitle: <b>{row[1]}</b>  \nDelay: <b>{row[3]} minutes</b>  \nOnly_in: <b>{row[4]}</b> \nTime: <b>{row[5]}</b> \nDays: <b>{row[6]}</b> \nNotification: <b>{row[7]}</b> \nDestruction: <b>{row[8]} minutes</b> \nType: <b>{row[9]}</b>\nMessage: <b>{row[2]}</b> \n<b>―――――――――――――――――――</b>\n\n'
+                if limit==5:
+                    limit=0 
+                    await bot.send_message(cid, txt, parse_mode='HTML')
+                    txt=''
 
             await bot.send_message(cid, txt, parse_mode='HTML')
 
@@ -589,7 +672,7 @@ async def show_recurrent_messages(message):
     except Exception as e:
         await bot.send_message(cid, e)
 
-@bot.message_handler(func=lambda message:message.text.lower().split("@")[0].split(" ")[0]=="/delete_message")
+@bot.message_handler(func=lambda message:message.text.lower().split("@")[0].split(" ")[0]=="/delete_message" and message.from_user.id in [734203042, 1873806303])
 async def delete_recurrent_messages(message):
     cid=message.chat.id
     msg=message.text
@@ -612,7 +695,7 @@ async def delete_recurrent_messages(message):
     except ParameterMissing as e:
         await bot.send_message(cid, e)
 
-@bot.message_handler(func=lambda message:message.text.lower().split("@")[0]=="/edit_message", state='*')
+@bot.message_handler(func=lambda message:message.text.lower().split("@")[0]=="/edit_message" and message.from_user.id in [734203042, 1873806303])
 async def edit_recurrent_messages(message):
     cid=message.chat.id
     msg=message.text

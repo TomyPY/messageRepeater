@@ -7,7 +7,7 @@ async def main():
     try:
         
         bot.add_custom_filter(asyncio_filters.StateFilter(bot))
-        await asyncio.gather(bot.infinity_polling(), manage_messages())
+        await asyncio.gather(bot.polling(non_stop=True, timeout=40), manage_messages())
 
     except Exception as e:
 
