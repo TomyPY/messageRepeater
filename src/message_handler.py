@@ -68,7 +68,11 @@ async def manage_messages():
                         if message[8]!=None and message[11]!='' and message[12]!=None:
                             if datetime.strptime(message[12], "%Y-%m-%d %H:%M:%S.%f")<=datetime.now(pytz.timezone("Asia/Calcutta")).replace(tzinfo=None):
                                 message_id=message[11].split(" ")[0] if message[11].split(" ")[0]!='' else message[11].split(" ")[1]
-                                await bot.delete_message(chat_id, int(message_id))
+                                try:
+                                    await bot.delete_message(chat_id, int(message_id))
+                                except:
+                                    pass
+                                
                                 new_msg_ids=message[11].replace(str(message_id), "").strip()
 
                                 RecurrentMessage().edit('destruction_ids', int(message[0]), new_msg_ids)
