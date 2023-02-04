@@ -122,33 +122,8 @@ async def send_message(arr):
     except Exception as e:
         print('send_message',e)
 
-#FUNCTION TO LOAD SCHEDULES
-# async def run_one_time():
-#     try:
-#         data=RecurrentMessage().read()
-#         chat['scheduled_tasks']={}
-#         for i in data:
-#             if i[-1]=='daily':
-#                 scheduled_task=aioschedule.every().day.at(i[5]).do(send_message, arr=i)
-#                 chat['scheduled_tasks'][int(i[0])]=scheduled_task
-#             elif i[-1]=='days':
-#                 scheduled_task=aioschedule.every(int(i[3])).minutes.do(send_message, arr=i)
-#                 chat['scheduled_tasks'][int(i[0])]=scheduled_task
-#             elif i[-1]=='allways':
-#                 scheduled_task=aioschedule.every(int(i[3])).minutes.do(send_message, arr=i)
-#                 chat['scheduled_tasks'][int(i[0])]=scheduled_task
-#         print(chat['scheduled_tasks'])
-#     except Exception as e:
-#         print(e)
-
-#FUNCTION TO DELETE MESSAGE OF A SCHEDULE
-# async def delete_message(msg):
-#     await bot.delete_message(msg[0], msg[1])
-#     return aioschedule.CancelJob
-
 
 #TELEGRAM HANDLER
-
 @bot.message_handler(func=lambda message:message.text.lower().split("@")[0]=="/start" and message.from_user.id in [734203042, 1873806303])
 async def welcome_and_explanation(message):
     cid=message.chat.id
